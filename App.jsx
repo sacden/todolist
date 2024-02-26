@@ -1,7 +1,5 @@
 import React from 'react';
 import 'react-native-gesture-handler';
-import {SafeAreaView, View, StatusBar, StyleSheet, Text} from 'react-native';
-
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import LoginScreen from './src/components/screens/LoginScreen';
@@ -21,16 +19,5 @@ function App() {
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
 
 export default App;
