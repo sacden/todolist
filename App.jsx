@@ -6,7 +6,7 @@ function App() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar />
       <View style={styles.container}>
-        <Text>Test</Text>
+        <Text>Text</Text>
       </View>
     </SafeAreaView>
   );
