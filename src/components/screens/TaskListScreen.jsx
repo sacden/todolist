@@ -1,49 +1,85 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback} from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 import {
   View,
   Text,
   SafeAreaView,
-  StatusBar,
   StyleSheet,
   TextInput,
   TouchableOpacity,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 
-const TaskList = ({navigation}) => {
-  const [tasks, setTasks] = useState([
-    {id: 1, text: 'Task 1', completed: false},
-    {id: 2, text: 'Task 2', completed: true},
-  ]);
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-  const deleteTask = taskId => {
-    setTasks(tasks.filter(task => task.id !== taskId));
+const TaskListScreen = ({navigation}) => {
+  const [tasks, setTasks] = useState([]);
+
+  //loading tasks from AsyncStorage
+  const loadTasks = async () => {
+    const tasksJson = await AsyncStorage.getItem('tasks');
+    const loadedTasks = tasksJson ? JSON.parse(tasksJson) : [];
+    setTasks(loadedTasks);
   };
 
-  const updateTaskText = (id, newText) => {
-    setTasks(
-      tasks.map(task => {
+  // Ensures task list updates every time we open this screen
+  useFocusEffect(
+    useCallback(() => {
+      loadTasks();
+    }, []),
+  );
+
+  //Editing text in a task list
+  const updateTaskText = async (id, newText) => {
+    try {
+      const tasksJson = await AsyncStorage.getItem('tasks');
+      let tasks = tasksJson ? JSON.parse(tasksJson) : [];
+      const updatedTasks = tasks.map(task => {
         if (task.id === id) {
           return {...task, text: newText};
         }
         return task;
-      }),
-    );
+      });
+      await AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
+      setTasks(updatedTasks);
+    } catch (error) {
+      console.error('Error during updating text in the task: ', error);
+    }
   };
 
-  const toggleTaskCompletion = taskId => {
-    const updatedTasks = tasks.map(task => {
-      if (task.id === taskId) {
-        return {...task, completed: !task.completed};
-      }
-      return task;
-    });
-    setTasks(updatedTasks);
+  //Deleting a task from our TaskList
+  const deleteTask = async taskId => {
+    try {
+      const tasksJson = await AsyncStorage.getItem('tasks');
+      let tasks = tasksJson ? JSON.parse(tasksJson) : [];
+      const filteredTasks = tasks.filter(task => task.id !== taskId);
+      await AsyncStorage.setItem('tasks', JSON.stringify(filteredTasks));
+      setTasks(filteredTasks);
+    } catch (error) {
+      console.error('Error during deleting: ', error);
+    }
+  };
+
+  //checking or unchecking task in a task list
+  const toggleTaskCompletion = async taskId => {
+    try {
+      const tasksJson = await AsyncStorage.getItem('tasks');
+      let tasks = tasksJson ? JSON.parse(tasksJson) : [];
+      const updatedTasks = tasks.map(task => {
+        if (task.id === taskId) {
+          return {...task, completed: !task.completed};
+        }
+        return task;
+      });
+      await AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
+      setTasks(updatedTasks);
+    } catch (error) {
+      console.error('Error during changing status of the task: ', error);
+    }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar />
       <View style={styles.container}>
         {tasks.map(task => (
           <View key={task.id} style={styles.taskContainer}>
@@ -110,13 +146,14 @@ const styles = StyleSheet.create({
   deleteButton: {
     width: 25,
     backgroundColor: 'red',
-    borderRadius: 5,
+    borderRadius: 15,
     padding: 5,
     alignItems: 'center',
   },
   deleteButtonText: {
     color: '#ffffff',
+    fontSize: 12,
   },
 });
 
-export default TaskList;
+export default TaskListScreen;

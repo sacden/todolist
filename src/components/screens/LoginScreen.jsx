@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {
   SafeAreaView,
-  StatusBar,
   View,
   TextInput,
   TouchableOpacity,
@@ -10,7 +9,7 @@ import {
   Text,
 } from 'react-native';
 
-const Login = ({navigation}) => {
+const LoginScreen = ({navigation}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -24,7 +23,6 @@ const Login = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar />
       <View style={styles.container}>
         <TextInput
           placeholder="Login"
@@ -78,4 +76,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Login;
+export default LoginScreen;
